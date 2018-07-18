@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/style.css" />
+    <title>Dojo Secret</title>
+    @using DojoSecret.Models
+    @model DashboardModel
+    @using System.Linq
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <span class="navbar-brand">DojoSecrets</span>
+        <h3>Welcome to the DojoSecrets!</h3>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class='nav-link' href="/logout">Logout</a>
+            </li>
+        </ul>
+    </nav><br>
+    <h1>Welcome, @ViewBag.User.First_Name @ViewBag.User.Last_Name!</h1>
+    <div class="container">
+        <table>
+            <form class="form" asp-action="PostMessage" asp-controller="Home" method="post">
+                <tr>
+                    <td><label asp-for="secrets.Content">Tell us a secret:</label></td>
+                </tr>
+                <tr>
+                    <td><textarea name="Content" cols="120" rows="3"></textarea></td>
+                    <td><span asp-validation-for="secrets.Content"></span></td>
+                </tr>
+                <tr>
+                    <td style="float:right"><button class="btn btn-primary">Spill It</button></td>
+                </tr>
+            </form>
+            <a href="MostPopular">Most Popular Secrets</a>
+        </table>
+    </div>
+    @foreach(var i in ViewBag.Secrets)
+    {
+        <div class="container">
+            <p>@i.Creator.First_Name @i.Creator.Last_Name - @i.Created_At.ToString("MMMM dd, yyyy"), Likes: @i.likes.Count</p>
+            <p style="text-indent: 20px;">@i.Content</p>
+            @if (@ViewBag.User.Id == @i.CreatorId)
+            {
+                <a href="Delete/@i.Id">Delete</a>
+            }
+            else
+            {
+                int count = 0;
+                @foreach(var like in @i.likes)
+                {
+                    @if(@like.PromoterId == @ViewBag.User.Id)
+                    {
+                        count = 1;
+                    }
+                }
+                if (count == 1)
+                {
+                    <a href="Undo/@i.Id">Un-Like</a>
+                }
+                else
+                {
+                    <a href="Like/@i.Id">Like</a>
+                }
+            }
+        </div>
+    }
+</body>
+</html>
